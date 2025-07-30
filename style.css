@@ -198,6 +198,7 @@ input {
   border-bottom: var(--gameboard-grid-line-thickness) solid var(--color-accent);
   width: 100%;
   height: 100%;
+  cursor: pointer;
 }
 
 .cell:nth-child(3n) {
