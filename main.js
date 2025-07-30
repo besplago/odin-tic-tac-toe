@@ -33,7 +33,58 @@ function createGameboard() {
     return 9;
   }
 
-  return { move, getMoveCount, getBoard, getBoardSize };
+  function checkWin(rowMove, colMove, state) {
+    // Check row
+    for (let col = 0; col < board.length; col++) {
+      console.log(`[${rowMove}][${col}] == ${board[rowMove][col].toString()}`);
+
+      if (board[rowMove][col] != state) {
+        break;
+      }
+      if (col == board.length - 1) {
+        return true;
+      }
+    }
+
+    // Check col
+    for (let row = 0; row < board.length; row++) {
+      console.log(`[${row}][${colMove}] == ${board[row][colMove].toString()}`);
+      if (board[row][colMove] != state) {
+        break;
+      }
+      if (row == board.length) {
+        return true;
+      }
+    }
+
+    // Check diagonal
+    if (rowMove === colMove) {
+      for (let i = 0; i < board.length; i++) {
+        if (board[i][i] != state) {
+          break;
+        }
+        if (i == board.length - 1) {
+          return true;
+        }
+      }
+    }
+
+    // Check anti-diagonal
+    if (rowMove + colMove == board.length - 1) {
+      for (let i = 0; i < board.length; i++) {
+        if (board[i][board.length - 1 - i] != state) {
+          break;
+        }
+        if (i == board.length - 1) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  return { move, getMoveCount, getBoard, getBoardSize, checkWin };
 }
 
 function createPlayer(name, state) {
@@ -51,11 +102,11 @@ function createPlayer(name, state) {
     return wins;
   }
 
-  function won() {
+  function increaseWin() {
     wins++;
   }
 
-  return { getName, getState, getWins, won };
+  return { getName, getState, getWins, increaseWin };
 }
 
 const displayer = (() => {
@@ -84,6 +135,12 @@ const game = (() => {
     }
 
     displayer.displayBoard(gameboard.getBoard());
+
+    if (gameboard.checkWin(row, col, playerToMove.getState())) {
+      console.log("Winner winner chicken dinner");
+      playerToMove.increaseWin();
+      return;
+    }
 
     if (playerToMove === player1) {
       playerToMove = player2;
