@@ -132,10 +132,8 @@ const displayer = (() => {
 
       if (cellState.description === "x") {
         cellElement.textContent = "X";
-        cellElement.classList.add("x");
       } else if (cellState.description === "o") {
         cellElement.textContent = "O";
-        cellElement.classList.add("o");
       } else {
         cellElement.textContent = "";
       }
