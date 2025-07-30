@@ -134,8 +134,13 @@ input {
   font-size: var(--font-size-base);
 }
 
+button {
+  cursor: pointer;
+}
+
 input {
   width: var(--input-width);
+  text-align: right;
 }
 
 .module,
@@ -186,4 +191,12 @@ input {
 #action-button {
   width: var(--gameboard-grid-size);
   height: var(--action-button-height);
+}
+
+#action-button:hover {
+  scale: 1.02;
+}
+
+#action-button:focus {
+  border: solid var(--color-font);
 }
