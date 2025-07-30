@@ -105,11 +105,24 @@ button {
   font-size: 25px;
 }
 
-.module {
-  background-color: var(--color-module-background);
+.module,
+.input-module {
   border-radius: 25px;
   box-shadow: 1px 4px 10px rgb(0, 0, 0, 0.25);
   border: none;
+}
+
+.module {
+  background-color: var(--color-module-background);
+}
+
+.input-module {
+  background-color: var(--color-accent);
+}
+
+#player1-name,
+#player2-name {
+  height: 3.125rem;
 }
 
 #gameboard-grid {
