@@ -1,6 +1,6 @@
 const States = Object.freeze({
   X: Symbol("x"),
-  Y: Symbol("o"),
+  O: Symbol("o"),
   EMPTY: Symbol(" "),
 });
 
@@ -116,8 +116,8 @@ const displayer = (() => {
 
 const game = (() => {
   const gameboard = createGameboard();
-  const player1 = createPlayer("Naruto", States.X);
-  const player2 = createPlayer("Sasuke", States.Y);
+  const player1 = createPlayer("Naruto", States.O);
+  const player2 = createPlayer("Sasuke", States.X);
   let playerToMove = player1;
 
   while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
