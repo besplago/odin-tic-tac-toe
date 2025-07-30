@@ -97,6 +97,7 @@ h6 {
   --gameboard-grid-size: 32rem;
   --input-height: 3.125rem;
   --action-button-height: 6.25rem;
+  --stats-height: 9.375rem;
 
   /* Borders & Effects */
   --border-radius: 25px;
@@ -145,15 +146,11 @@ button {
   background-color: var(--color-accent);
 }
 
-.small-display,
-#player1-name,
-#player2-name {
-  height: var(--input-height);
-}
-
-#player1-name,
-#player2-name {
-  width: auto; /* Adjust as needed */
+#stats {
+  display: flex;
+  justify-content: space-between;
+  width: var(--gameboard-grid-size);
+  height: var(--stats-height);
 }
 
 #gameboard-grid {
