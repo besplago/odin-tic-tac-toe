@@ -83,7 +83,21 @@ h6 {
       format("svg");
 }
 
+:root {
+  --font-main: "Stem Extra Light";
+
+  --color-body-background: #cad8da;
+  --color-module-background: #eaeaea;
+  --color-accent: #bebfb6;
+  --color-font: #2e303f;
+}
+
+body {
+  background-color: var(--color-body-background);
+}
+
 p,
 button {
-  font-family: "Stem Extra Light";
+  font-family: var(--font-main);
+  color: var(--color-font);
 }
