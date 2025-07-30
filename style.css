@@ -90,6 +90,8 @@ h6 {
   --color-module-background: #eaeaea;
   --color-accent: #bebfb6;
   --color-font: #2e303f;
+
+  --gameboard-grid-size: 32rem;
 }
 
 body {
@@ -100,4 +102,21 @@ p,
 button {
   font-family: var(--font-main);
   color: var(--color-font);
+}
+
+.module {
+  background-color: var(--color-module-background);
+  border-radius: 25px;
+  box-shadow: 1px 4px 10px rgb(0, 0, 0, 0.25);
+  border: none;
+}
+
+#gameboard-grid {
+  width: var(--gameboard-grid-size);
+  height: var(--gameboard-grid-size);
+}
+
+#action-button {
+  width: var(--gameboard-grid-size);
+  height: 6.25rem;
 }
