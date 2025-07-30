@@ -128,8 +128,6 @@ const displayer = (() => {
     flatBoard.forEach((cellState, index) => {
       const cellElement = cells[index];
 
-      cellElement.classList.remove("x", "o");
-
       if (cellState.description === "x") {
         cellElement.textContent = "X";
       } else if (cellState.description === "o") {
