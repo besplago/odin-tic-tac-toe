@@ -54,7 +54,7 @@ function createGameboard() {
       if (board[row][colMove] != state) {
         break;
       }
-      if (row == board.length) {
+      if (row == board.length - 1) {
         return true;
       }
     }
