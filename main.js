@@ -13,8 +13,12 @@ function createGameboard() {
   let moveCount = 0;
 
   function move(x, y, state) {
+    if (board[x][y] !== States.EMPTY) {
+      return false;
+    }
     board[x][y] = state;
     moveCount++;
+    return true;
   }
 
   function getMoveCount() {
@@ -72,8 +76,15 @@ const game = (() => {
     console.log(`${playerToMove.getName()}'s turn`);
     let row = prompt("row");
     let col = prompt("col");
-    gameboard.move(row, col, playerToMove.getState());
+
+    let moveValidity = gameboard.move(row, col, playerToMove.getState());
+    if (moveValidity === false) {
+      console.log("invalid move");
+      continue;
+    }
+
     displayer.displayBoard(gameboard.getBoard());
+
     if (playerToMove === player1) {
       playerToMove = player2;
     } else {
