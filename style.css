@@ -120,6 +120,11 @@ button {
   background-color: var(--color-accent);
 }
 
+.small-display {
+  height: 3.125rem;
+  width: 3.125rem;
+}
+
 #player1-name,
 #player2-name {
   height: 3.125rem;
