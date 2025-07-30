@@ -54,6 +54,14 @@ function createPlayer(name, state) {
   return { getName, getState, getWins, won };
 }
 
+const displayer = (() => {
+  function displayBoard(board) {
+    console.table(board);
+  }
+
+  return { displayBoard };
+})();
+
 const game = (() => {
   const gameboard = createGameboard();
   const player1 = createPlayer("Naruto", States.X);
@@ -65,13 +73,14 @@ const game = (() => {
     let row = prompt("row");
     let col = prompt("col");
     gameboard.move(row, col, playerToMove.getState());
-    console.table(gameboard.getBoard());
+    displayer.displayBoard(gameboard.getBoard());
     if (playerToMove === player1) {
       playerToMove = player2;
     } else {
       playerToMove = player1;
     }
   }
+  console.log("Draw");
 })();
 
 game;
