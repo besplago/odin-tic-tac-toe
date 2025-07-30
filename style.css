@@ -102,6 +102,7 @@ p,
 button {
   font-family: var(--font-main);
   color: var(--color-font);
+  font-size: 25px;
 }
 
 .module {
