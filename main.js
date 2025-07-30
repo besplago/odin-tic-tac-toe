@@ -112,7 +112,7 @@ function createPlayer(name, state) {
 }
 
 const displayer = (() => {
-  let cells = null; // Cache for gameboard cells
+  let cells = null;
 
   function displayBoard(board) {
     console.table(board);
@@ -128,10 +128,8 @@ const displayer = (() => {
     flatBoard.forEach((cellState, index) => {
       const cellElement = cells[index];
 
-      // Clear existing classes
       cellElement.classList.remove("x", "o");
 
-      // Update content based on cell state
       if (cellState.description === "x") {
         cellElement.textContent = "X";
         cellElement.classList.add("x");
