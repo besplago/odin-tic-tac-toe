@@ -125,6 +125,12 @@ button {
   width: 3.125rem;
 }
 
+/* #symbols-container,
+#scores-container {
+  height: 9.375rem;
+  width: 5.625rem;
+} */
+
 #player1-name,
 #player2-name {
   height: 3.125rem;
