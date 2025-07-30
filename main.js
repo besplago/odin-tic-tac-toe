@@ -114,36 +114,40 @@ const displayer = (() => {
   return { displayBoard };
 })();
 
-// const game = (() => {
-//   const gameboard = createGameboard();
-//   const player1 = createPlayer("Naruto", States.O);
-//   const player2 = createPlayer("Sasuke", States.X);
-//   let playerToMove = player1;
+const game = (() => {
+  function play() {
+    const gameboard = createGameboard();
+    const player1 = createPlayer("Naruto", States.O);
+    const player2 = createPlayer("Sasuke", States.X);
+    let playerToMove = player1;
 
-//   while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
-//     console.log(`${playerToMove.getName()}'s turn`);
-//     let row = parseInt(prompt("row"));
-//     let col = parseInt(prompt("col"));
+    while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
+      console.log(`${playerToMove.getName()}'s turn`);
+      let row = parseInt(prompt("row"));
+      let col = parseInt(prompt("col"));
 
-//     let moveValidity = gameboard.move(row, col, playerToMove.getState());
-//     if (moveValidity === false) {
-//       console.log("invalid move");
-//       continue;
-//     }
+      let moveValidity = gameboard.move(row, col, playerToMove.getState());
+      if (moveValidity === false) {
+        console.log("invalid move");
+        continue;
+      }
 
-//     displayer.displayBoard(gameboard.getBoard());
+      displayer.displayBoard(gameboard.getBoard());
 
-//     if (gameboard.checkWin(row, col, playerToMove.getState())) {
-//       console.log("Winner winner chicken dinner");
-//       playerToMove.increaseWin();
-//       return;
-//     }
+      if (gameboard.checkWin(row, col, playerToMove.getState())) {
+        console.log("Winner winner chicken dinner");
+        playerToMove.increaseWin();
+        return;
+      }
 
-//     if (playerToMove === player1) {
-//       playerToMove = player2;
-//     } else {
-//       playerToMove = player1;
-//     }
-//   }
-//   console.log("Draw");
-// })();
+      if (playerToMove === player1) {
+        playerToMove = player2;
+      } else {
+        playerToMove = player1;
+      }
+    }
+    console.log("Draw");
+  }
+
+  return { play };
+})();
