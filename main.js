@@ -122,8 +122,8 @@ const game = (() => {
 
   while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
     console.log(`${playerToMove.getName()}'s turn`);
-    let row = prompt("row");
-    let col = prompt("col");
+    let row = parseInt(prompt("row"));
+    let col = parseInt(prompt("col"));
 
     let moveValidity = gameboard.move(row, col, playerToMove.getState());
     if (moveValidity === false) {
