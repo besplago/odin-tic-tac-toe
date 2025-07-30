@@ -66,3 +66,24 @@ h6 {
 #__next {
   isolation: isolate;
 }
+
+/* My css */
+@font-face {
+  font-family: "Stem Extra Light";
+  src: url("https://db.onlinewebfonts.com/t/234c7114c6c8ddd5bba3c39f31dcb01f.eot");
+  src: url("https://db.onlinewebfonts.com/t/234c7114c6c8ddd5bba3c39f31dcb01f.eot?#iefix")
+      format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/234c7114c6c8ddd5bba3c39f31dcb01f.woff2")
+      format("woff2"),
+    url("https://db.onlinewebfonts.com/t/234c7114c6c8ddd5bba3c39f31dcb01f.woff")
+      format("woff"),
+    url("https://db.onlinewebfonts.com/t/234c7114c6c8ddd5bba3c39f31dcb01f.ttf")
+      format("truetype"),
+    url("https://db.onlinewebfonts.com/t/234c7114c6c8ddd5bba3c39f31dcb01f.svg#Stem Extra Light")
+      format("svg");
+}
+
+p,
+button {
+  font-family: "Stem Extra Light";
+}
