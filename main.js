@@ -4,6 +4,11 @@ const CellStates = Object.freeze({
   EMPTY: Symbol(" "),
 });
 
+const GameStates = Object.freeze({
+  PLAYING: Symbol("playing"),
+  GAME_OVER: Symbol("game over"),
+});
+
 function createGameboard() {
   let board = [
     [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
@@ -111,16 +116,25 @@ const displayer = (() => {
     console.table(board);
   }
 
+  function drawBoard(board) {}
+
   return { displayBoard };
 })();
 
 const game = (() => {
-  function play() {
-    const gameboard = createGameboard();
-    const player1 = createPlayer("Naruto", CellStates.O);
-    const player2 = createPlayer("Sasuke", CellStates.X);
-    let playerToMove = player1;
+  let gameState = GameStates.PLAYING;
 
+  const gameboard = createGameboard();
+  const player1 = createPlayer("Naruto", CellStates.O);
+  const player2 = createPlayer("Sasuke", CellStates.X);
+
+  let playerToMove = player1;
+
+  document.addEventListener("playerMove", () => {
+    console.log(`${playerToMove.getName()} moved`);
+  });
+
+  function play() {
     while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
       console.log(`${playerToMove.getName()}'s turn`);
       let row = parseInt(prompt("row"));
@@ -151,3 +165,32 @@ const game = (() => {
 
   return { play };
 })();
+
+function setupEventListeners() {
+  const cells = document.querySelectorAll(".cell");
+
+  cells.forEach((cell, index) => {
+    cell.addEventListener("click", () => {
+      const row = Math.floor(index / 3);
+      const col = index % 3;
+
+      const moveEvent = new CustomEvent("playerMove", {
+        detail: {
+          row: row,
+          col: col,
+        },
+        bubbles: true,
+      });
+
+      cell.dispatchEvent(moveEvent);
+      console.log(`Clicked cell at: Row ${row}, Col ${col} (Index: ${index})`);
+    });
+  });
+
+  const player1NameInput = document.getElementById("player1-name");
+  player1NameInput.addEventListener("change", () => {
+    console.log("name changes");
+  });
+}
+
+setupEventListeners();
