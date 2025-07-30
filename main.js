@@ -36,8 +36,6 @@ function createGameboard() {
   function checkWin(rowMove, colMove, state) {
     // Check row
     for (let col = 0; col < board.length; col++) {
-      console.log(`[${rowMove}][${col}] == ${board[rowMove][col].toString()}`);
-
       if (board[rowMove][col] != state) {
         break;
       }
@@ -48,7 +46,6 @@ function createGameboard() {
 
     // Check col
     for (let row = 0; row < board.length; row++) {
-      console.log(`[${row}][${colMove}] == ${board[row][colMove].toString()}`);
       if (board[row][colMove] != state) {
         break;
       }
