@@ -84,14 +84,30 @@ h6 {
 }
 
 :root {
+  /* Fonts */
   --font-main: "Stem Extra Light";
 
+  /* Colors */
   --color-body-background: #cad8da;
   --color-module-background: #eaeaea;
   --color-accent: #bebfb6;
   --color-font: #2e303f;
 
+  /* Sizes */
   --gameboard-grid-size: 32rem;
+  --input-height: 3.125rem;
+  --action-button-height: 6.25rem;
+
+  /* Borders & Effects */
+  --border-radius: 25px;
+  --box-shadow: 1px 4px 10px rgba(0, 0, 0, 0.25);
+  --border-none: none;
+
+  /* Typography */
+  --font-size-base: 25px;
+
+  /* Spacing */
+  --body-gap: 1.25rem;
 }
 
 body {
@@ -101,7 +117,7 @@ body {
   height: 100vh;
   justify-content: center;
   align-items: center;
-  gap: 1.25rem;
+  gap: var(--body-gap);
   background-color: var(--color-body-background);
 }
 
@@ -109,14 +125,14 @@ p,
 button {
   font-family: var(--font-main);
   color: var(--color-font);
-  font-size: 25px;
+  font-size: var(--font-size-base);
 }
 
 .module,
 .input-module {
-  border-radius: 25px;
-  box-shadow: 1px 4px 10px rgb(0, 0, 0, 0.25);
-  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: var(--border-none);
 }
 
 .module {
@@ -127,20 +143,15 @@ button {
   background-color: var(--color-accent);
 }
 
-.small-display {
-  height: 3.125rem;
-  width: 3.125rem;
+.small-display,
+#player1-name,
+#player2-name {
+  height: var(--input-height);
 }
-
-/* #symbols-container,
-#scores-container {
-  height: 9.375rem;
-  width: 5.625rem;
-} */
 
 #player1-name,
 #player2-name {
-  height: 3.125rem;
+  width: auto; /* Adjust as needed */
 }
 
 #gameboard-grid {
@@ -150,5 +161,5 @@ button {
 
 #action-button {
   width: var(--gameboard-grid-size);
-  height: 6.25rem;
+  height: var(--action-button-height);
 }
