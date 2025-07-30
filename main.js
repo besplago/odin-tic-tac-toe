@@ -1,4 +1,4 @@
-const States = Object.freeze({
+const CellStates = Object.freeze({
   X: Symbol("x"),
   O: Symbol("o"),
   EMPTY: Symbol(" "),
@@ -6,14 +6,14 @@ const States = Object.freeze({
 
 function createGameboard() {
   let board = [
-    [States.EMPTY, States.EMPTY, States.EMPTY],
-    [States.EMPTY, States.EMPTY, States.EMPTY],
-    [States.EMPTY, States.EMPTY, States.EMPTY],
+    [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
+    [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
+    [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
   ];
   let moveCount = 0;
 
   function move(x, y, state) {
-    if (board[x][y] !== States.EMPTY) {
+    if (board[x][y] !== CellStates.EMPTY) {
       return false;
     }
     board[x][y] = state;
@@ -117,8 +117,8 @@ const displayer = (() => {
 const game = (() => {
   function play() {
     const gameboard = createGameboard();
-    const player1 = createPlayer("Naruto", States.O);
-    const player2 = createPlayer("Sasuke", States.X);
+    const player1 = createPlayer("Naruto", CellStates.O);
+    const player2 = createPlayer("Sasuke", CellStates.X);
     let playerToMove = player1;
 
     while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
