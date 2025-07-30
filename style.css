@@ -98,6 +98,8 @@ h6 {
   --input-height: 3.125rem;
   --action-button-height: 6.25rem;
   --stats-height: 9.375rem;
+  --small-display-size: 3.125rem;
+  --input-width: 16.25rem;
 
   /* Borders & Effects */
   --border-radius: 25px;
@@ -109,6 +111,7 @@ h6 {
 
   /* Spacing */
   --module-padding: 1.25rem;
+  --module-gap: 0.625rem;
   --body-gap: 1.25rem;
 }
 
@@ -124,10 +127,15 @@ body {
 }
 
 p,
-button {
+button,
+input {
   font-family: var(--font-main);
   color: var(--color-font);
   font-size: var(--font-size-base);
+}
+
+input {
+  width: var(--input-width);
 }
 
 .module,
@@ -139,18 +147,35 @@ button {
 }
 
 .module {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--module-gap);
   background-color: var(--color-module-background);
 }
 
 .input-module {
+  height: var(--small-display-size);
   background-color: var(--color-accent);
+}
+
+.small-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--small-display-size);
 }
 
 #stats {
   display: flex;
   justify-content: space-between;
   width: var(--gameboard-grid-size);
-  height: var(--stats-height);
+}
+
+#symbols-container {
+  display: flex;
+  flex-direction: column;
 }
 
 #gameboard-grid {
