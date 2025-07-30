@@ -112,13 +112,43 @@ function createPlayer(name, state) {
 }
 
 const displayer = (() => {
+  let cells = null; // Cache for gameboard cells
+
   function displayBoard(board) {
     console.table(board);
   }
 
-  function drawBoard(board) {}
+  function drawBoard(board) {
+    if (!cells) {
+      cells = document.querySelectorAll(".cell");
+    }
 
-  return { displayBoard };
+    const flatBoard = board.flat();
+
+    flatBoard.forEach((cellState, index) => {
+      const cellElement = cells[index];
+
+      // Clear existing classes
+      cellElement.classList.remove("x", "o");
+
+      // Update content based on cell state
+      if (cellState.description === "x") {
+        cellElement.textContent = "X";
+        cellElement.classList.add("x");
+      } else if (cellState.description === "o") {
+        cellElement.textContent = "O";
+        cellElement.classList.add("o");
+      } else {
+        cellElement.textContent = "";
+      }
+    });
+  }
+
+  function drawPlayingState() {}
+
+  function drawGameOverState() {}
+
+  return { displayBoard, drawBoard, drawPlayingState, drawGameOverState };
 })();
 
 const game = (() => {
@@ -130,40 +160,47 @@ const game = (() => {
 
   let playerToMove = player1;
 
-  document.addEventListener("playerMove", () => {
-    console.log(`${playerToMove.getName()} moved`);
-  });
-
-  function play() {
-    while (gameboard.getMoveCount() < gameboard.getBoardSize()) {
-      console.log(`${playerToMove.getName()}'s turn`);
-      let row = parseInt(prompt("row"));
-      let col = parseInt(prompt("col"));
-
-      let moveValidity = gameboard.move(row, col, playerToMove.getState());
-      if (moveValidity === false) {
-        console.log("invalid move");
-        continue;
-      }
-
-      displayer.displayBoard(gameboard.getBoard());
-
-      if (gameboard.checkWin(row, col, playerToMove.getState())) {
-        console.log("Winner winner chicken dinner");
-        playerToMove.increaseWin();
-        return;
-      }
-
-      if (playerToMove === player1) {
-        playerToMove = player2;
-      } else {
-        playerToMove = player1;
-      }
+  function playMove(playedRow, playedCol) {
+    let moveValidity = gameboard.move(
+      playedRow,
+      playedCol,
+      playerToMove.getState()
+    );
+    if (moveValidity === false) {
+      console.log("invalid move");
+      return;
     }
-    console.log("Draw");
+
+    displayer.drawBoard(gameboard.getBoard());
+    displayer.displayBoard(gameboard.getBoard());
+
+    if (gameboard.checkWin(playedRow, playedCol, playerToMove.getState())) {
+      console.log("Winner winner chicken dinner");
+      playerToMove.increaseWin();
+      gameState = GameStates.GAME_OVER;
+      return;
+    }
+
+    if (playerToMove === player1) {
+      playerToMove = player2;
+    } else {
+      playerToMove = player1;
+    }
+    return;
   }
 
-  return { play };
+  document.addEventListener("playerMove", (e) => {
+    if (gameState === GameStates.PLAYING) {
+      playMove(e.detail.row, e.detail.col);
+      displayer.drawPlayingState();
+      if (gameState === GameStates.GAME_OVER) {
+        console.log("handle game over");
+        displayer.drawGameOverState();
+      }
+    }
+  });
+
+  return { playMove };
 })();
 
 function setupEventListeners() {
@@ -183,7 +220,6 @@ function setupEventListeners() {
       });
 
       cell.dispatchEvent(moveEvent);
-      console.log(`Clicked cell at: Row ${row}, Col ${col} (Index: ${index})`);
     });
   });
 
