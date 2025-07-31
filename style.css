@@ -211,7 +211,8 @@ input {
   justify-content: center;
   align-items: center;
   font-size: 4rem;
-  font-weight: bold;
+  font-family: var(--font-main);
+  color: var(--color-font);
 }
 
 .cell:nth-child(3n) {
