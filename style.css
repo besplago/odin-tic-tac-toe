@@ -188,6 +188,10 @@ input {
   background-color: rgb(248, 172, 97);
 }
 
+.player-won-round {
+  background-color: rgb(97, 248, 107);
+}
+
 #gameboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

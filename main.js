@@ -152,9 +152,34 @@ const displayer = (() => {
     }
   }
 
-  function drawGameOverState() {}
+  function drawGameOverState(playerWhoWon) {
+    const player1SymbolElement = document.getElementById("player1-symbol");
+    const player1ScoreElement = document.getElementById("player1-score");
+    const player1NameElement = document.getElementById("player1-name");
+    const player2SymbolElement = document.getElementById("player2-symbol");
+    const player2ScoreElement = document.getElementById("player2-score");
+    const player2NameElement = document.getElementById("player2-name");
 
-  return { displayBoard, drawBoard, drawPlayingState, drawGameOverState };
+    if (playerWhoWon.getCellState() === CellStates.O) {
+      player1SymbolElement.classList.add("player-won-round");
+      player1ScoreElement.classList.add("player-won-round");
+      player1NameElement.classList.add("player-won-round");
+    } else {
+      player2SymbolElement.classList.add("player-won-round");
+      player2ScoreElement.classList.add("player-won-round");
+      player2NameElement.classList.add("player-won-round");
+    }
+  }
+
+  function drawNewRound() {}
+
+  return {
+    displayBoard,
+    drawBoard,
+    drawPlayingState,
+    drawGameOverState,
+    drawNewRound,
+  };
 })();
 
 const game = (() => {
@@ -203,7 +228,7 @@ const game = (() => {
       playMove(e.detail.row, e.detail.col);
       if (gameState === GameStates.GAME_OVER) {
         console.log("handle game over");
-        displayer.drawGameOverState();
+        displayer.drawGameOverState(playerToMove);
       }
     }
   });
