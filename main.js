@@ -246,7 +246,6 @@ const game = (() => {
     if (gameState === GameStates.PLAYING) {
       playMove(e.detail.row, e.detail.col);
       if (gameState === GameStates.GAME_OVER) {
-        console.log("handle game over");
         displayer.drawGameOverState(playerToMove);
       }
     }
