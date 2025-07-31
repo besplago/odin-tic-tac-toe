@@ -184,6 +184,10 @@ input {
   flex-direction: column;
 }
 
+.players-turn {
+  background-color: rgb(248, 172, 97);
+}
+
 #gameboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;

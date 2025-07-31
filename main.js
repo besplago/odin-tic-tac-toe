@@ -89,15 +89,15 @@ function createGameboard() {
   return { move, getMoveCount, getBoard, getBoardSize, checkWin };
 }
 
-function createPlayer(name, state) {
+function createPlayer(name, cellState) {
   let wins = 0;
 
   function getName() {
     return name;
   }
 
-  function getState() {
-    return state;
+  function getCellState() {
+    return cellState;
   }
 
   function getWins() {
@@ -108,7 +108,7 @@ function createPlayer(name, state) {
     wins++;
   }
 
-  return { getName, getState, getWins, increaseWin };
+  return { getName, getCellState, getWins, increaseWin };
 }
 
 const displayer = (() => {
@@ -138,7 +138,19 @@ const displayer = (() => {
     });
   }
 
-  function drawPlayingState() {}
+  function drawPlayingState(playerToMove, player1Wins, player2Wins) {
+    const player1SymbolElement = document.getElementById("player1-symbol");
+    const player2SymbolElement = document.getElementById("player2-symbol");
+
+    player1SymbolElement.classList.remove("players-turn");
+    player2SymbolElement.classList.remove("players-turn");
+
+    if (playerToMove.getCellState() === CellStates.O) {
+      player1SymbolElement.classList.add("players-turn");
+    } else {
+      player2SymbolElement.classList.add("players-turn");
+    }
+  }
 
   function drawGameOverState() {}
 
@@ -153,12 +165,17 @@ const game = (() => {
   const player2 = createPlayer("Sasuke", CellStates.X);
 
   let playerToMove = player1;
+  displayer.drawPlayingState(
+    playerToMove,
+    player1.getWins(),
+    player2.getWins()
+  );
 
   function playMove(playedRow, playedCol) {
     let moveValidity = gameboard.move(
       playedRow,
       playedCol,
-      playerToMove.getState()
+      playerToMove.getCellState()
     );
     if (moveValidity === false) {
       console.log("invalid move");
@@ -168,7 +185,7 @@ const game = (() => {
     displayer.drawBoard(gameboard.getBoard());
     displayer.displayBoard(gameboard.getBoard());
 
-    if (gameboard.checkWin(playedRow, playedCol, playerToMove.getState())) {
+    if (gameboard.checkWin(playedRow, playedCol, playerToMove.getCellState())) {
       console.log("Winner winner chicken dinner");
       playerToMove.increaseWin();
       gameState = GameStates.GAME_OVER;
@@ -180,13 +197,18 @@ const game = (() => {
     } else {
       playerToMove = player1;
     }
+
+    displayer.drawPlayingState(
+      playerToMove,
+      player1.getWins(),
+      player2.getWins()
+    );
     return;
   }
 
   document.addEventListener("playerMove", (e) => {
     if (gameState === GameStates.PLAYING) {
       playMove(e.detail.row, e.detail.col);
-      displayer.drawPlayingState();
       if (gameState === GameStates.GAME_OVER) {
         console.log("handle game over");
         displayer.drawGameOverState();
