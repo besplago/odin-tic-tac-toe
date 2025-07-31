@@ -181,10 +181,14 @@ const displayer = (() => {
       player1SymbolElement.classList.add("player-won-round");
       player1ScoreElement.classList.add("player-won-round");
       player1NameElement.classList.add("player-won-round");
+      player1ScoreElement.getElementsByTagName("p")[0].textContent =
+        playerWhoWon.getWins();
     } else {
       player2SymbolElement.classList.add("player-won-round");
       player2ScoreElement.classList.add("player-won-round");
       player2NameElement.classList.add("player-won-round");
+      player2ScoreElement.getElementsByTagName("p")[0].textContent =
+        playerWhoWon.getWins();
     }
   }
 
@@ -239,8 +243,6 @@ const game = (() => {
     displayer.drawPlayingState(playerToMove);
     return;
   }
-
-  function restartGame() {}
 
   document.addEventListener("playerMove", (e) => {
     if (gameState === GameStates.PLAYING) {
