@@ -1,340 +1,395 @@
-const CellStates = Object.freeze({
-  X: Symbol("x"),
-  O: Symbol("o"),
-  EMPTY: Symbol(" "),
+// =============================================
+// DOMAIN MODELS (Business Logic Layer)
+// =============================================
+
+const CELL_STATE = Object.freeze({
+  X: "X",
+  O: "O",
+  EMPTY: "",
 });
 
-const GameStates = Object.freeze({
-  PLAYING: Symbol("playing"),
-  GAME_OVER: Symbol("game over"),
+const GAME_STATE = Object.freeze({
+  PLAYING: "playing",
+  PLAYER_WON: "player_won",
+  TIE: "tie",
 });
 
-function createGameboard() {
-  let board = [
-    [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
-    [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
-    [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
-  ];
-  let moveCount = 0;
+class Gameboard {
+  constructor() {
+    this.reset();
+  }
 
-  function move(x, y, state) {
-    if (board[x][y] !== CellStates.EMPTY) {
+  reset() {
+    this.board = Array(3)
+      .fill()
+      .map(() => Array(3).fill(CELL_STATE.EMPTY));
+    this.moveCount = 0;
+  }
+
+  makeMove(row, col, symbol) {
+    if (this.board[row][col] !== CELL_STATE.EMPTY) {
       return false;
     }
-    board[x][y] = state;
-    moveCount++;
+    this.board[row][col] = symbol;
+    this.moveCount++;
     return true;
   }
 
-  function getMoveCount() {
-    return moveCount;
-  }
-
-  function getBoard() {
-    return board;
-  }
-
-  function getBoardSize() {
-    return 9;
-  }
-
-  function resetGameboard() {
-    board = [
-      [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
-      [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
-      [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
-    ];
-
-    moveCount = 0;
-  }
-
-  function checkWin(rowMove, colMove, state) {
+  checkWin(row, col, symbol) {
     // Check row
-    for (let col = 0; col < board.length; col++) {
-      if (board[rowMove][col] != state) {
-        break;
-      }
-      if (col == board.length - 1) {
-        return true;
-      }
+    if (this.board[row].every((cell) => cell === symbol)) {
+      return true;
     }
 
-    // Check col
-    for (let row = 0; row < board.length; row++) {
-      if (board[row][colMove] != state) {
-        break;
-      }
-      if (row == board.length - 1) {
-        return true;
-      }
+    // Check column
+    if (this.board.every((boardRow) => boardRow[col] === symbol)) {
+      return true;
     }
 
-    // Check diagonal
-    if (rowMove === colMove) {
-      for (let i = 0; i < board.length; i++) {
-        if (board[i][i] != state) {
-          break;
-        }
-        if (i == board.length - 1) {
-          return true;
-        }
-      }
+    // Check main diagonal
+    if (
+      row === col &&
+      this.board.every((boardRow, i) => boardRow[i] === symbol)
+    ) {
+      return true;
     }
 
     // Check anti-diagonal
-    if (rowMove + colMove == board.length - 1) {
-      for (let i = 0; i < board.length; i++) {
-        if (board[i][board.length - 1 - i] != state) {
-          break;
-        }
-        if (i == board.length - 1) {
-          return true;
-        }
-      }
+    if (
+      row + col === 2 &&
+      this.board.every((boardRow, i) => boardRow[2 - i] === symbol)
+    ) {
+      return true;
     }
 
     return false;
   }
 
-  return {
-    move,
-    getMoveCount,
-    getBoard,
-    getBoardSize,
-    checkWin,
-    resetGameboard,
-  };
+  isFull() {
+    return this.moveCount === 9;
+  }
+
+  getBoard() {
+    return this.board.map((row) => [...row]);
+  }
 }
 
-function createPlayer(name, cellState) {
-  let wins = 0;
-
-  function getName() {
-    return name;
+// Player data model
+class Player {
+  constructor(name, symbol) {
+    this.name = name;
+    this.symbol = symbol;
+    this.wins = 0;
   }
 
-  function getCellState() {
-    return cellState;
+  incrementWins() {
+    this.wins++;
   }
 
-  function getWins() {
-    return wins;
+  getName() {
+    return this.name;
   }
 
-  function increaseWin() {
-    wins++;
+  setName(name) {
+    this.name = name;
   }
 
-  return { getName, getCellState, getWins, increaseWin };
+  getSymbol() {
+    return this.symbol;
+  }
+
+  getWins() {
+    return this.wins;
+  }
 }
 
-const displayer = (() => {
-  let cells = null;
+// =============================================
+// GAME ENGINE (Business Logic Orchestration)
+// =============================================
 
-  function displayBoard(board) {
-    console.table(board);
+class GameEngine {
+  constructor() {
+    this.gameboard = new Gameboard();
+    this.player1 = new Player("Naruto", CELL_STATE.O);
+    this.player2 = new Player("Sasuke", CELL_STATE.X);
+    this.currentPlayer = this.player1;
+    this.gameState = GAME_STATE.PLAYING;
+    this.listeners = {
+      gameStateChanged: [],
+      boardChanged: [],
+      playerChanged: [],
+      scoreChanged: [],
+    };
   }
 
-  function drawBoard(board) {
-    if (!cells) {
-      cells = document.querySelectorAll(".cell");
+  on(event, callback) {
+    if (this.listeners[event]) {
+      this.listeners[event].push(callback);
+    }
+  }
+
+  emit(event, data) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach((callback) => callback(data));
+    }
+  }
+
+  makeMove(row, col) {
+    if (this.gameState !== GAME_STATE.PLAYING) {
+      return false;
     }
 
+    if (!this.gameboard.makeMove(row, col, this.currentPlayer.getSymbol())) {
+      return false;
+    }
+
+    this.emit("boardChanged", {
+      board: this.gameboard.getBoard(),
+      lastMove: { row, col, symbol: this.currentPlayer.getSymbol() },
+    });
+
+    if (this.gameboard.checkWin(row, col, this.currentPlayer.getSymbol())) {
+      this.currentPlayer.incrementWins();
+      this.gameState = GAME_STATE.PLAYER_WON;
+      this.emit("gameStateChanged", {
+        state: this.gameState,
+        winner: this.currentPlayer,
+        player1: this.player1,
+        player2: this.player2,
+      });
+      this.emit("scoreChanged", {
+        player1: this.player1,
+        player2: this.player2,
+      });
+      return true;
+    }
+
+    if (this.gameboard.isFull()) {
+      this.gameState = GAME_STATE.TIE;
+      this.emit("gameStateChanged", {
+        state: this.gameState,
+        winner: null,
+        player1: this.player1,
+        player2: this.player2,
+      });
+      return true;
+    }
+
+    this.currentPlayer =
+      this.currentPlayer === this.player1 ? this.player2 : this.player1;
+    this.emit("playerChanged", {
+      currentPlayer: this.currentPlayer,
+      player1: this.player1,
+      player2: this.player2,
+    });
+
+    return true;
+  }
+
+  startNewRound() {
+    this.gameboard.reset();
+    this.currentPlayer = this.player1;
+    this.gameState = GAME_STATE.PLAYING;
+
+    this.emit("boardChanged", {
+      board: this.gameboard.getBoard(),
+      lastMove: null,
+    });
+    this.emit("gameStateChanged", {
+      state: this.gameState,
+      winner: null,
+      player1: this.player1,
+      player2: this.player2,
+    });
+    this.emit("playerChanged", {
+      currentPlayer: this.currentPlayer,
+      player1: this.player1,
+      player2: this.player2,
+    });
+  }
+
+  updatePlayerName(playerNumber, name) {
+    const player = playerNumber === 1 ? this.player1 : this.player2;
+    player.setName(name);
+  }
+
+  getCurrentGameState() {
+    return {
+      gameState: this.gameState,
+      currentPlayer: this.currentPlayer,
+      player1: this.player1,
+      player2: this.player2,
+      board: this.gameboard.getBoard(),
+    };
+  }
+}
+
+// =============================================
+// UI RENDERER (Presentation Layer)
+// =============================================
+
+class UIRenderer {
+  constructor() {
+    this.elements = {
+      cells: document.querySelectorAll(".cell"),
+      player1Symbol: document.getElementById("player1-symbol"),
+      player2Symbol: document.getElementById("player2-symbol"),
+      player1Score: document.getElementById("player1-score"),
+      player2Score: document.getElementById("player2-score"),
+      player1Name: document.getElementById("player1-name"),
+      player2Name: document.getElementById("player2-name"),
+      actionButton: document.getElementById("action-button"),
+    };
+  }
+
+  renderBoard(boardData) {
+    const { board } = boardData;
     const flatBoard = board.flat();
 
-    flatBoard.forEach((cellState, index) => {
-      const cellElement = cells[index];
-
-      if (cellState.description === "x") {
-        cellElement.textContent = "X";
-      } else if (cellState.description === "o") {
-        cellElement.textContent = "O";
-      } else {
-        cellElement.textContent = "";
-      }
+    this.elements.cells.forEach((cell, index) => {
+      cell.textContent = flatBoard[index];
     });
   }
 
-  function drawPlayingState(playerToMove) {
-    const player1SymbolElement = document.getElementById("player1-symbol");
-    const player2SymbolElement = document.getElementById("player2-symbol");
+  renderPlayerTurn(playerData) {
+    const { currentPlayer, player1, player2 } = playerData;
 
-    player1SymbolElement.classList.remove("players-turn");
-    player2SymbolElement.classList.remove("players-turn");
+    this.elements.player1Symbol.classList.remove("players-turn");
+    this.elements.player2Symbol.classList.remove("players-turn");
 
-    if (playerToMove.getCellState() === CellStates.O) {
-      player1SymbolElement.classList.add("players-turn");
+    if (currentPlayer === player1) {
+      this.elements.player1Symbol.classList.add("players-turn");
     } else {
-      player2SymbolElement.classList.add("players-turn");
+      this.elements.player2Symbol.classList.add("players-turn");
     }
   }
 
-  function drawGameOverState(playerWhoWon) {
-    const player1SymbolElement = document.getElementById("player1-symbol");
-    const player1ScoreElement = document.getElementById("player1-score");
-    const player1NameElement = document.getElementById("player1-name");
-    const player2SymbolElement = document.getElementById("player2-symbol");
-    const player2ScoreElement = document.getElementById("player2-score");
-    const player2NameElement = document.getElementById("player2-name");
+  renderGameState(gameData) {
+    const { state, winner } = gameData;
 
-    if (playerWhoWon.getCellState() === CellStates.O) {
-      player1SymbolElement.classList.add("player-won-round");
-      player1ScoreElement.classList.add("player-won-round");
-      player1NameElement.classList.add("player-won-round");
-      player1ScoreElement.getElementsByTagName("p")[0].textContent =
-        playerWhoWon.getWins();
-    } else {
-      player2SymbolElement.classList.add("player-won-round");
-      player2ScoreElement.classList.add("player-won-round");
-      player2NameElement.classList.add("player-won-round");
-      player2ScoreElement.getElementsByTagName("p")[0].textContent =
-        playerWhoWon.getWins();
-    }
-  }
-
-  function drawNewRound() {
-    // Get all relevant DOM elements
-    const player1SymbolElement = document.getElementById("player1-symbol");
-    const player1ScoreElement = document.getElementById("player1-score");
-    const player1NameElement = document.getElementById("player1-name");
-    const player2SymbolElement = document.getElementById("player2-symbol");
-    const player2ScoreElement = document.getElementById("player2-score");
-    const player2NameElement = document.getElementById("player2-name");
-
-    // Remove all "player-won-round" classes
     [
-      player1SymbolElement,
-      player1ScoreElement,
-      player1NameElement,
-      player2SymbolElement,
-      player2ScoreElement,
-      player2NameElement,
+      this.elements.player1Symbol,
+      this.elements.player1Score,
+      this.elements.player1Name,
+      this.elements.player2Symbol,
+      this.elements.player2Score,
+      this.elements.player2Name,
     ].forEach((el) => {
-      el.classList.remove("player-won-round");
+      el.classList.remove("player-won-round", "players-turn");
     });
 
-    // Remove turn indicator classes
-    player1SymbolElement.classList.remove("players-turn");
-    player2SymbolElement.classList.remove("players-turn");
+    if (state === GAME_STATE.PLAYER_WON && winner) {
+      const isPlayer1Winner = winner.getSymbol() === CELL_STATE.O;
+      const winnerElements = isPlayer1Winner
+        ? [
+            this.elements.player1Symbol,
+            this.elements.player1Score,
+            this.elements.player1Name,
+          ]
+        : [
+            this.elements.player2Symbol,
+            this.elements.player2Score,
+            this.elements.player2Name,
+          ];
+
+      winnerElements.forEach((el) => el.classList.add("player-won-round"));
+      this.elements.actionButton.textContent = "New Round";
+    } else if (state === GAME_STATE.TIE) {
+      this.elements.actionButton.textContent = "New Round";
+    } else if (state === GAME_STATE.PLAYING) {
+      this.elements.actionButton.textContent = "Restart Round";
+    }
   }
 
-  return {
-    displayBoard,
-    drawBoard,
-    drawPlayingState,
-    drawGameOverState,
-    drawNewRound,
-  };
-})();
-
-const game = (() => {
-  let gameState = GameStates.PLAYING;
-
-  const gameboard = createGameboard();
-  const player1 = createPlayer("Naruto", CellStates.O);
-  const player2 = createPlayer("Sasuke", CellStates.X);
-
-  let playerToMove = player1;
-  displayer.drawPlayingState(playerToMove);
-
-  function playMove(playedRow, playedCol) {
-    let moveValidity = gameboard.move(
-      playedRow,
-      playedCol,
-      playerToMove.getCellState()
-    );
-    if (moveValidity === false) {
-      console.log("invalid move");
-      return;
-    }
-
-    displayer.drawBoard(gameboard.getBoard());
-    displayer.displayBoard(gameboard.getBoard());
-
-    if (gameboard.checkWin(playedRow, playedCol, playerToMove.getCellState())) {
-      playerToMove.increaseWin();
-      gameState = GameStates.GAME_OVER;
-      const gameOverEvent = new CustomEvent("gameOver", { bubbles: true });
-      document.dispatchEvent(gameOverEvent);
-      return;
-    }
-
-    if (gameboard.getMoveCount() === gameboard.getBoardSize()) {
-      const gameOverEvent = new CustomEvent("gameOver", { bubbles: true });
-      document.dispatchEvent(gameOverEvent);
-      return;
-    }
-
-    if (playerToMove === player1) {
-      playerToMove = player2;
-    } else {
-      playerToMove = player1;
-    }
-
-    displayer.drawPlayingState(playerToMove);
-    return;
+  renderScores(scoreData) {
+    const { player1, player2 } = scoreData;
+    this.elements.player1Score.querySelector("p").textContent =
+      player1.getWins();
+    this.elements.player2Score.querySelector("p").textContent =
+      player2.getWins();
   }
-
-  document.addEventListener("playerMove", (e) => {
-    if (gameState === GameStates.PLAYING) {
-      playMove(e.detail.row, e.detail.col);
-      if (gameState === GameStates.GAME_OVER) {
-        displayer.drawGameOverState(playerToMove);
-      }
-    }
-  });
-
-  document.addEventListener("actionButtonClicked", () => {
-    gameboard.resetGameboard();
-    displayer.drawNewRound();
-    playerToMove = player1;
-    gameState = GameStates.PLAYING;
-    displayer.drawBoard(gameboard.getBoard());
-    displayer.drawPlayingState(playerToMove);
-  });
-
-  return { playMove };
-})();
-
-function setupEventListeners() {
-  const cells = document.querySelectorAll(".cell");
-
-  cells.forEach((cell, index) => {
-    cell.addEventListener("click", () => {
-      const row = Math.floor(index / 3);
-      const col = index % 3;
-
-      const moveEvent = new CustomEvent("playerMove", {
-        detail: {
-          row: row,
-          col: col,
-        },
-        bubbles: true,
-      });
-
-      cell.dispatchEvent(moveEvent);
-    });
-  });
-
-  const player1NameInput = document.getElementById("player1-name");
-  player1NameInput.addEventListener("change", () => {
-    console.log("name changes");
-  });
-
-  const actionButton = document.getElementById("action-button");
-  actionButton.addEventListener("click", () => {
-    const actionEvent = new CustomEvent("actionButtonClicked", {
-      bubbles: true,
-    });
-    actionButton.dispatchEvent(actionEvent);
-    actionButton.textContent = "Restart Round";
-  });
-
-  document.addEventListener("gameOver", () => {
-    console.log("Game Over event received");
-    const actionButton = document.getElementById("action-button");
-    actionButton.textContent = "New Round";
-  });
 }
 
-setupEventListeners();
+// =============================================
+// INPUT HANDLER (User Interface Layer)
+// =============================================
+
+class InputHandler {
+  constructor(gameEngine) {
+    this.gameEngine = gameEngine;
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    document.querySelectorAll(".cell").forEach((cell, index) => {
+      cell.addEventListener("click", () => {
+        const row = Math.floor(index / 3);
+        const col = index % 3;
+        this.gameEngine.makeMove(row, col);
+      });
+    });
+
+    document.getElementById("action-button").addEventListener("click", () => {
+      this.gameEngine.startNewRound();
+    });
+
+    document.getElementById("player1-name").addEventListener("change", (e) => {
+      this.gameEngine.updatePlayerName(1, e.target.value);
+    });
+
+    document.getElementById("player2-name").addEventListener("change", (e) => {
+      this.gameEngine.updatePlayerName(2, e.target.value);
+    });
+  }
+}
+
+// =============================================
+// APPLICATION BOOTSTRAP
+// =============================================
+
+class TicTacToeApp {
+  constructor() {
+    this.gameEngine = new GameEngine();
+    this.renderer = new UIRenderer();
+    this.inputHandler = new InputHandler(this.gameEngine);
+
+    this.setupGameEngineListeners();
+    this.initializeDisplay();
+  }
+
+  setupGameEngineListeners() {
+    this.gameEngine.on("boardChanged", (data) => {
+      this.renderer.renderBoard(data);
+    });
+
+    this.gameEngine.on("playerChanged", (data) => {
+      this.renderer.renderPlayerTurn(data);
+    });
+
+    this.gameEngine.on("gameStateChanged", (data) => {
+      this.renderer.renderGameState(data);
+    });
+
+    this.gameEngine.on("scoreChanged", (data) => {
+      this.renderer.renderScores(data);
+    });
+  }
+
+  initializeDisplay() {
+    const gameState = this.gameEngine.getCurrentGameState();
+    this.renderer.renderBoard({ board: gameState.board });
+    this.renderer.renderPlayerTurn({
+      currentPlayer: gameState.currentPlayer,
+      player1: gameState.player1,
+      player2: gameState.player2,
+    });
+    this.renderer.renderScores({
+      player1: gameState.player1,
+      player2: gameState.player2,
+    });
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  new TicTacToeApp();
+});
