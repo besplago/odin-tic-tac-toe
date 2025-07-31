@@ -192,7 +192,31 @@ const displayer = (() => {
     }
   }
 
-  function drawNewRound() {}
+  function drawNewRound() {
+    // Get all relevant DOM elements
+    const player1SymbolElement = document.getElementById("player1-symbol");
+    const player1ScoreElement = document.getElementById("player1-score");
+    const player1NameElement = document.getElementById("player1-name");
+    const player2SymbolElement = document.getElementById("player2-symbol");
+    const player2ScoreElement = document.getElementById("player2-score");
+    const player2NameElement = document.getElementById("player2-name");
+
+    // Remove all "player-won-round" classes
+    [
+      player1SymbolElement,
+      player1ScoreElement,
+      player1NameElement,
+      player2SymbolElement,
+      player2ScoreElement,
+      player2NameElement,
+    ].forEach((el) => {
+      el.classList.remove("player-won-round");
+    });
+
+    // Remove turn indicator classes
+    player1SymbolElement.classList.remove("players-turn");
+    player2SymbolElement.classList.remove("players-turn");
+  }
 
   return {
     displayBoard,
@@ -231,6 +255,8 @@ const game = (() => {
       console.log("Winner winner chicken dinner");
       playerToMove.increaseWin();
       gameState = GameStates.GAME_OVER;
+      const gameOverEvent = new CustomEvent("gameOver", { bubbles: true });
+      document.dispatchEvent(gameOverEvent);
       return;
     }
 
@@ -254,14 +280,10 @@ const game = (() => {
   });
 
   document.addEventListener("actionButtonClicked", () => {
-    switch (gameState) {
-      case GameStates.PLAYING:
-        gameboard.resetGameboard();
-        break;
-
-      default:
-        break;
-    }
+    gameboard.resetGameboard();
+    displayer.drawNewRound();
+    playerToMove = player1;
+    gameState = GameStates.PLAYING;
     displayer.drawBoard(gameboard.getBoard());
     displayer.drawPlayingState(playerToMove);
   });
@@ -300,6 +322,13 @@ function setupEventListeners() {
       bubbles: true,
     });
     actionButton.dispatchEvent(actionEvent);
+    actionButton.textContent = "Restart Round";
+  });
+
+  document.addEventListener("gameOver", () => {
+    console.log("Game Over event received");
+    const actionButton = document.getElementById("action-button");
+    actionButton.textContent = "New Round";
   });
 }
 
