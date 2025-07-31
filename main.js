@@ -252,9 +252,14 @@ const game = (() => {
     displayer.displayBoard(gameboard.getBoard());
 
     if (gameboard.checkWin(playedRow, playedCol, playerToMove.getCellState())) {
-      console.log("Winner winner chicken dinner");
       playerToMove.increaseWin();
       gameState = GameStates.GAME_OVER;
+      const gameOverEvent = new CustomEvent("gameOver", { bubbles: true });
+      document.dispatchEvent(gameOverEvent);
+      return;
+    }
+
+    if (gameboard.getMoveCount() === gameboard.getBoardSize()) {
       const gameOverEvent = new CustomEvent("gameOver", { bubbles: true });
       document.dispatchEvent(gameOverEvent);
       return;
