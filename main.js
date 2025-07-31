@@ -138,7 +138,7 @@ const displayer = (() => {
     });
   }
 
-  function drawPlayingState(playerToMove, player1Wins, player2Wins) {
+  function drawPlayingState(playerToMove) {
     const player1SymbolElement = document.getElementById("player1-symbol");
     const player2SymbolElement = document.getElementById("player2-symbol");
 
@@ -165,11 +165,7 @@ const game = (() => {
   const player2 = createPlayer("Sasuke", CellStates.X);
 
   let playerToMove = player1;
-  displayer.drawPlayingState(
-    playerToMove,
-    player1.getWins(),
-    player2.getWins()
-  );
+  displayer.drawPlayingState(playerToMove);
 
   function playMove(playedRow, playedCol) {
     let moveValidity = gameboard.move(
@@ -198,11 +194,7 @@ const game = (() => {
       playerToMove = player1;
     }
 
-    displayer.drawPlayingState(
-      playerToMove,
-      player1.getWins(),
-      player2.getWins()
-    );
+    displayer.drawPlayingState(playerToMove);
     return;
   }
 
