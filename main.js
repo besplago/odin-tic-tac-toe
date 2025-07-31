@@ -38,6 +38,16 @@ function createGameboard() {
     return 9;
   }
 
+  function resetGameboard() {
+    board = [
+      [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
+      [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
+      [CellStates.EMPTY, CellStates.EMPTY, CellStates.EMPTY],
+    ];
+
+    moveCount = 0;
+  }
+
   function checkWin(rowMove, colMove, state) {
     // Check row
     for (let col = 0; col < board.length; col++) {
@@ -86,7 +96,14 @@ function createGameboard() {
     return false;
   }
 
-  return { move, getMoveCount, getBoard, getBoardSize, checkWin };
+  return {
+    move,
+    getMoveCount,
+    getBoard,
+    getBoardSize,
+    checkWin,
+    resetGameboard,
+  };
 }
 
 function createPlayer(name, cellState) {
@@ -223,6 +240,8 @@ const game = (() => {
     return;
   }
 
+  function restartGame() {}
+
   document.addEventListener("playerMove", (e) => {
     if (gameState === GameStates.PLAYING) {
       playMove(e.detail.row, e.detail.col);
@@ -231,6 +250,19 @@ const game = (() => {
         displayer.drawGameOverState(playerToMove);
       }
     }
+  });
+
+  document.addEventListener("actionButtonClicked", () => {
+    switch (gameState) {
+      case GameStates.PLAYING:
+        gameboard.resetGameboard();
+        break;
+
+      default:
+        break;
+    }
+    displayer.drawBoard(gameboard.getBoard());
+    displayer.drawPlayingState(playerToMove);
   });
 
   return { playMove };
@@ -259,6 +291,14 @@ function setupEventListeners() {
   const player1NameInput = document.getElementById("player1-name");
   player1NameInput.addEventListener("change", () => {
     console.log("name changes");
+  });
+
+  const actionButton = document.getElementById("action-button");
+  actionButton.addEventListener("click", () => {
+    const actionEvent = new CustomEvent("actionButtonClicked", {
+      bubbles: true,
+    });
+    actionButton.dispatchEvent(actionEvent);
   });
 }
 
